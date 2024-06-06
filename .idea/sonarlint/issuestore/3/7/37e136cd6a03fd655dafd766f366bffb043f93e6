@@ -1,4 +1,0 @@
-
-^python:S2208"GImport only needed names or import the module and then use its members.(‰ôã 
-ppython:S1542"SRename function "serializedATN" to match the regular expression ^[a-z_][a-z0-9_]*$.(ŒìÒ‰ûÿÿÿÿ
-„python:S101"hRename class "myGrammarLexer" to match the regular expression ^_?([A-Z_][a-zA-Z0-9]*|[a-z_][a-z0-9_]*)$.(†ð§½øÿÿÿÿ
