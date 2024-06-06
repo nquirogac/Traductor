@@ -2,8 +2,24 @@ grammar LatinoGrammar;
 
 inicio  : 'hola' terminal (',' ID)* ;
 source : (sentencia)* ;
-sentencia: assignableId sentenciaId | 'romper';
-
+sentencia: assignableId sentenciaId
+    | builtInFuncsSingleArg
+    | builtInFuncsMultiArg
+    | builtInFuncsNoArg
+    | codeBlock
+    | functionReturn
+    | 'romper';
+sentenciaConcat : (sentencia)*;
+builtInFuncsSingleArg : BuiltInFuncWordsSingleArg functionCallSingleArg;
+builtInFuncsMultiArg : BuiltInFuncWordsMultiArg functionCall;
+builtInFuncsNoArg : BuiltInFuncWordsNoArg '(' ')' ;
+codeBlock : functionBlock
+     | conditionalBlock;
+functionBlock : FunctionKeyword ID '(' functionArgsDef ')' sentencia sentenciaConcat 'fin' ;
+functionArgsDef : (ID functionArgsDefConcat)* ;
+functionArgsDefConcat : (',' ID )*;
+functionReturn : ReturnKeyword assignableExpr ;
+conditionalBlock 
 assignableId : mutableId assignableIdConcat;
 mutableId : ID mutableIdModifierConcat;
 mutableIdModifierConcat : (mutableIdModifier)*;
@@ -28,13 +44,20 @@ binaryOp : NumericOp | StringOp | LogicOp;
 idExp : ID idModifier ;
 idModifier : (mutableIdModifier)* | (functionCall)*;
 terminal : 'nulo'
-         | 'falso'
-         | 'cierto'
-         | 'verdadero'
-         | Tkn_real
-         | idExp
-         | LUnaryOperator terminal
-         | OperableBuiltInFuncWords functionCallSingleArg; //falta str, ListDefinition, DictDefinition
+    | 'falso'
+    | 'cierto'
+    | 'verdadero'
+    | Tkn_real
+    | idExp
+    | LUnaryOperator terminal
+    | OperableBuiltInFuncWords functionCallSingleArg; //falta str, ListDefinition, DictDefinition
+BuiltInFuncWordsSingleArg : 'escribir'
+    | 'imprimir'
+    | 'poner';
+BuiltInFuncWordsMultiArg : 'imprimirf' ;
+BuiltInFuncWordsNoArg : 'limpiar';
+FunctionKeyword : 'funcion' | 'fun' ;
+ReturnKeyword : 'retorno' | 'retornar' | 'ret' ;
 AssignOp : '%=' | '/=' | '*=' | '-=' | '+=' | '=' ;
 NumericOp : '+' | '-' | '*' | '/' | '^' | '%' ;
 StringOp : '..' | '~=' ;
