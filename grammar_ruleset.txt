@@ -1,0 +1,151 @@
+Source -> Sentencia Source
+Source -> _epsilon
+Sentencia -> AssignableId SentenciaId
+Sentencia -> BuiltInFuncsSingleArg
+Sentencia -> BuiltInFuncsMultiArg
+Sentencia -> BuiltInFuncsNoArg
+Sentencia -> CodeBlock
+Sentencia -> FunctionReturn
+Sentencia -> romper
+SentenciaConcat -> Sentencia SentenciaConcat
+SentenciaConcat -> _epsilon
+BuiltInFuncsSingleArg -> BuiltInFuncWordsSingleArg FunctionCallSingleArg
+BuiltInFuncsMultiArg -> BuiltInFuncWordsMultiArg FunctionCall
+BuiltInFuncsNoArg -> BuiltInFuncWordsNoArg tkn_opening_par tkn_closing_par
+CodeBlock -> FunctionBlock
+CodeBlock -> ConditionalBlock
+CodeBlock -> SwitchBlock
+CodeBlock -> ForBlock
+CodeBlock -> WhileBlock
+CodeBlock -> ForRangeBlock
+CodeBlock -> DoWhileBlock
+FunctionBlock -> FunctionKeyword id tkn_opening_par FunctionArgsDef tkn_closing_par Sentencia SentenciaConcat fin
+FunctionArgsDef -> id FunctionArgsDefConcat
+FunctionArgsDef -> _epsilon
+FunctionArgsDefConcat -> tkn_comma id FunctionArgsDefConcat
+FunctionArgsDefConcat -> _epsilon
+FunctionReturn -> ReturnKeyword AssignableExpr
+ConditionalBlock -> si Expr Sentencia SentenciaConcat AlternateCondition NoCondition fin
+AlternateCondition -> osi Expr Sentencia SentenciaConcat AlternateCondition
+AlternateCondition -> _epsilon
+NoCondition -> sino Sentencia SentenciaConcat
+NoCondition -> _epsilon
+SwitchBlock -> elegir Expr SwitchCase SwitchCaseConcat DefaultCase fin
+SwitchCase -> CaseDef ConcatCaseDef Sentencia SentenciaConcat
+CaseDef -> caso CaseValidExpr tkn_colon
+CaseValidExpr -> tkn_str
+CaseValidExpr -> tkn_real
+ConcatCaseDef -> CaseDef ConcatCaseDef
+ConcatCaseDef -> _epsilon
+SwitchCaseConcat -> SwitchCase SwitchCaseConcat
+SwitchCaseConcat -> _epsilon
+DefaultCase -> DefaultCaseToken tkn_colon Sentencia SentenciaConcat
+DefaultCase -> _epsilon
+DefaultCaseToken -> defecto
+DefaultCaseToken -> otro
+ForBlock -> desde tkn_opening_par AssignableId AssignOp Expr tkn_semicolon Expr tkn_semicolon Sentencia SentenciaConcat tkn_closing_par Sentencia SentenciaConcat fin
+WhileBlock -> mientras Expr Sentencia SentenciaConcat fin
+ForRangeBlock -> para id en rango tkn_opening_par Expr ForRangeArgs2 tkn_closing_par Sentencia SentenciaConcat fin
+ForRangeArgs2 -> tkn_comma Expr ForRangeArgs3
+ForRangeArgs2 -> _epsilon
+ForRangeArgs3 -> tkn_comma Expr
+ForRangeArgs3 -> _epsilon
+DoWhileBlock -> repetir Sentencia SentenciaConcat hasta Expr
+AssignableId -> MutableId AssignableIdConcat
+MutableId -> id MutableIdModifierConcat
+MutableIdModifierConcat -> MutableIdModifier MutableIdModifierConcat
+MutableIdModifierConcat -> _epsilon
+AssignableIdConcat -> tkn_comma AssignableId
+AssignableIdConcat -> _epsilon
+SentenciaId -> AssignOp AssignableValue
+SentenciaId -> FunctionCall
+SentenciaId -> RUnaryOperator
+AssignableValue -> AssignableExpr
+AssignableValue -> leer tkn_opening_par tkn_closing_par
+AssignableExpr -> Expr AssignExprConcat
+AssignExprConcat -> tkn_comma AssignableExpr
+AssignExprConcat -> _epsilon
+FunctionCall -> tkn_opening_par FunctionCallArgs tkn_closing_par
+FunctionCallArgs -> Expr FunctionCallArgsConcat
+FunctionCallArgs -> _epsilon
+FunctionCallArgsConcat -> tkn_comma Expr FunctionCallArgsConcat
+FunctionCallArgsConcat -> _epsilon
+FunctionCallSingleArg -> tkn_opening_par Expr tkn_closing_par
+Expr -> Terminal BinaryOperation
+Expr -> tkn_opening_par Expr tkn_closing_par BinaryOperation
+BinaryOperation -> BinaryOp Expr
+BinaryOperation -> _epsilon
+IdExp -> id IdModifier
+IdModifier -> MutableIdModifier IdModifier
+IdModifier -> FunctionCall IdModifier
+IdModifier -> _epsilon
+MutableIdModifier -> ObjectProperty
+MutableIdModifier -> ListAcess
+ObjectProperty -> tkn_period id
+ListAcess -> tkn_opening_bra Expr tkn_closing_bra
+ListDefinition -> tkn_opening_bra ListBody tkn_closing_bra
+ListBody -> AssignableExpr
+ListBody -> _epsilon
+DictDefinition -> tkn_opening_key DictBody tkn_closing_key
+DictBody -> DictProperty DictPropertyConcat
+DictBody -> _epsilon
+DictProperty -> Expr tkn_colon DictAssignableExpr
+DictAssignableExpr -> Expr
+DictAssignableExpr -> FunctionKeyword tkn_opening_par FunctionArgsDef tkn_closing_par Sentencia SentenciaConcat fin
+DictPropertyConcat -> tkn_comma DictProperty DictPropertyConcat
+DictPropertyConcat -> _epsilon
+BinaryOp -> NumericOp
+BinaryOp -> StringOp
+BinaryOp -> LogicOp
+BuiltInFuncWordsSingleArg -> escribir
+BuiltInFuncWordsSingleArg -> imprimir
+BuiltInFuncWordsSingleArg -> poner
+BuiltInFuncWordsMultiArg -> imprimirf
+BuiltInFuncWordsNoArg -> limpiar
+FunctionKeyword -> funcion
+FunctionKeyword -> fun
+ReturnKeyword -> retorno
+ReturnKeyword -> retornar
+ReturnKeyword -> ret
+NumericOp -> tkn_plus
+NumericOp -> tkn_minus
+NumericOp -> tkn_times
+NumericOp -> tkn_div
+NumericOp -> tkn_power
+NumericOp -> tkn_mod
+StringOp -> tkn_concat
+StringOp -> tkn_regex
+LogicOp -> tkn_and
+LogicOp -> tkn_or
+LogicOp -> tkn_equal
+LogicOp -> tkn_neq
+LogicOp -> tkn_leq
+LogicOp -> tkn_geq
+LogicOp -> tkn_greater
+LogicOp -> tkn_less
+AssignOp -> tkn_mod_assign
+AssignOp -> tkn_div_assign
+AssignOp -> tkn_times_assign
+AssignOp -> tkn_minus_assign
+AssignOp -> tkn_plus_assign
+AssignOp -> tkn_assign
+RUnaryOperator -> tkn_increment
+RUnaryOperator -> tkn_decrement
+LUnaryOperator -> tkn_plus
+LUnaryOperator -> tkn_minus
+LUnaryOperator -> tkn_not
+OperableBuiltInFuncWords -> anumero
+OperableBuiltInFuncWords -> acadena
+OperableBuiltInFuncWords -> alogico
+OperableBuiltInFuncWords -> tipo
+Terminal -> tkn_str
+Terminal -> tkn_real
+Terminal -> IdExp
+Terminal -> verdadero
+Terminal -> cierto
+Terminal -> falso
+Terminal -> nulo
+Terminal -> LUnaryOperator Terminal
+Terminal -> OperableBuiltInFuncWords FunctionCallSingleArg
+Terminal -> ListDefinition
+Terminal -> DictDefinition
