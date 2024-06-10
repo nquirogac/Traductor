@@ -6,8 +6,9 @@ sentence                    :
                              assignableID (functionCall | assig | R_UNARY_OP ) |
                              builtInFuncSentence |
                              functionReturn |
-                             codeBlock |
                              doWhileBlock |
+                             codeBlock |
+                             opBuiltInTipo|
                              BREAK;
 assignableID                : ID assignableIDModifiers*;
 assignableIDModifiers       : listAccess | propertyAccess;
@@ -24,11 +25,12 @@ terminal                    :
                              NULL_VAL |
                              ID assignableIDModifiers* functionCall* |
                              L_UNARY_OP exp |
-                             OP_BUILTIN_FUNCS_ARG OPENING_PAR assignableExp CLOSING_PAR |
+                             opBuiltInTipo |
                              OP_BUILTIN_FUNCS_NO_ARG OPENING_PAR CLOSING_PAR |
                              anonymousFuncDef |
                              listDefinition |
                              dictDefinition;
+opBuiltInTipo               : OP_BUILTIN_FUNCS_ARG OPENING_PAR assignableExp CLOSING_PAR;
 assignableExp               : anonymousFuncDef | exp;
 functionCall                : OPENING_PAR optionalAssignableExpConcat CLOSING_PAR;
 anonymousFuncDef            : FUNC_KEYWORD OPENING_PAR (ID (COMMA ID)*)? CLOSING_PAR sentence+ BLOCK_END;
