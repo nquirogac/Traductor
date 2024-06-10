@@ -1,0 +1,46 @@
+x = 123
+y = acadena(x)
+
+escribir(x)           //Devolverá 123
+escribir(y)           //Devolverá 123
+
+/*Aunque visualmente parezca que no ha cambiado nada
+si usamos la función tipo() veremos la diferencia*/
+
+escribir(tipo(x))     //Devolverá decimal
+escribir(tipo(y))     //Devolverá cadena
+
+
+acadena(verdadero)     //Devolverá "verdadero"
+acadena(falso)         //Devolverá "falso"
+
+escribir(alogico(1))             //Devolverá "verdadero"
+escribir(alogico(-1))            //Devolverá "verdadero"
+escribir(alogico(3.14))          //Devolverá "verdadero"
+escribir(alogico("Hola"))        //Devolverá "verdadero"
+escribir(alogico(" "))           //Devolverá "verdadero" (al tener un espacio en blanco, es verdadero)
+escribir(alogico("0"))           //Devolverá "falso"
+escribir(alogico(nulo))          //Devolverá "falso"
+escribir(alogico(""))            //Devolverá "falso"
+
+
+escribir(anumero("3.14"))     //Devolverá 3.14
+escribir(anumero(""))         //Devolverá nulo
+escribir(anumero("0"))        //Devolverá nulo
+escribir(anumero(" "))        //Devolverá 32 (Esto correspondo al código ALT)
+escribir(anumero("9"))        //Devolverá 9
+escribir(anumero("9 "))       //Devolverá 57(Como tiene un espacio devolverá el código ALT)
+
+
+x = "hola"
+imprimirf("%c",x)                //Devolverá h
+imprimirf("%i",x)               //Devolverá 104
+imprimirf("%f",x)                //Devolverá 104.000000
+imprimirf("%d",x)                //Devolverá 104
+imprimirf("%o",x)                //Devolverá 150
+imprimirf("%x",x)                //Devolverá 68
+imprimirf("%e",x)                //Devolverá 5.556763e-307
+imprimirf("%s",x)                //Devolverá hola
+imprimirf("%%",x)                //Devolverá %
+imprimirf("%c",75)               //Devolverá K
+imprimirf("%c%c%c",75,76,77)     //Devolverá KLM

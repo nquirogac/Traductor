@@ -1,0 +1,48 @@
+funcion algo (a,b)
+  x=a*b   #x=6
+  funcion inner_fun (c,d)
+    #c=6, d=36
+    retorno c*c+d*d   #36+1296 = 1332
+  fin
+  ret inner_fun(x, x*x)
+fin
+
+x=algo(2,3)
+poner("x = " .. x) #1332
+
+escribir("Hola \"mundo\"")
+escribir('Hola \'mundo\'')
+
+escribir("Hola\nmundo")
+escribir("Hola mundo,\rLatino")
+
+escribir("Hola\bmundo")
+escribir("Hola\tmundo")
+
+
+escribir("Hola mundo\a")
+anio = "2020"
+escribir("Hola mundo,\0 Latino! y feliz "..anio)
+
+x = 5
+
+si x != "\0"
+  escribir ("El valor no es nulo")
+fin
+
+x = 5
+
+si x == "\0"
+  escribir ("Es un valor nulo")
+sino
+  escribir ("No es nulo")
+fin
+
+texto = "\110\157\154\141\040\155\165\156\144\157"
+escribir(texto)
+
+x = 100
+escribir(tipo(x))     //Devolverá decimal
+
+x = acadena("100")
+escribir(tipo(x))     //Devolverá cadena

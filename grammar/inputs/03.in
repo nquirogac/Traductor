@@ -1,0 +1,45 @@
+calificacion = 'B'
+
+elegir(calificacion)
+  caso 'A':
+  caso 'B':
+  caso 'C':
+    escribir("¡Excelente!.")
+  caso 'D':
+    escribir("Necesitas mejorar.")
+  caso 'F':
+    escribir("Has reprobado.")
+  otro:
+    escribir("Calificación invalida.")
+fin
+
+
+desde(i = 0; i < 50; i = i+10)
+  imprimir(i)
+fin
+
+carros = ["BMW", "Volvo", "Ford", "Nissan"]
+i = 0
+texto = ""
+
+mientras(i < 4)
+  texto = texto..carros[i].."\n"     # \n significa nueva línea
+i++
+fin
+
+escribir(texto)
+
+para i en rango(1,50)
+  para j en rango(1, 11)
+    poner(i .. ' x ' .. j .. ' = ' .. i * j)
+  fin
+  escribir("-------------")
+fin
+
+
+i=0
+
+repetir
+  escribir(i)
+  i++            //incrementamos el valor de i
+hasta i == 10

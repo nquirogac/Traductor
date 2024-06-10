@@ -1,0 +1,41 @@
+KEY1 = "my_key"
+
+carro = {
+  acadena(KEY1)..'1'  : "Renault",
+  "modelo" : "4",
+  "anio" .. "2014"  : 2014,
+  "color"  : "Blanco",
+
+  "counter": fun ()
+  fun printUseFullLife()
+   fun reportUsefulLife()
+     retorno "End of UseFul life c:" .. ' "ciao" '
+   fin
+  escribir(reportUsefulLife())
+  fin
+  km=0
+  mientras km<100
+
+    si !alogico("falso") && km!=20
+         poner("Km: "..km)
+    fin
+
+     si !alogico("verdadero") || km==60
+         poner("Just one :v ")
+    fin
+    km+=2
+  fin
+    printUseFullLife()
+  fin
+  
+
+}
+
+escribir(carro["my_key1"])
+
+poner(carro.anio2014)
+
+imprimir("Start of insane loop: \n")
+carro.counter()
+// This time there is only one comment 
+poner("Still working lmao")

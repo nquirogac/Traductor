@@ -1,0 +1,47 @@
+
+escribir("Greetings")
+limpiar()
+x = acadena(3)
+y = anumero("1245") ^ 2*anumero('12'.."67")
+
+escribir(y-x)
+
+z, d = (x/y), 2%3
+// Well done
+a, b, _ ,c = (123*2)^14, -1/1+-2, 1*anumero("12".."13"+'1'), alogico("verdadero")
+a, b, c = c,b,d      
+
+/* I dont´t have too many ideas **//*****/
+
+escribir("Value of a: "..a.."\n")
+poner('Value of b: ' ..b .."\n")
+imprimir('"Value of b: "' ..c .."'\n' ".._)
+
+/* 
+
+Don't forget to handle comments as well
+________-____________________-___________________-___________________
+
+*/
+
+funcion hola()                        //Aquí creamos una función con el nombre de hola()
+  ret "Hola Mundo, Latinito!"     
+fin                                   
+
+fun SimpleFun(input)
+  ret input*2
+fin
+
+evil_array = [
+    hola(),
+    90%3,
+    fun(input)
+    retornar (input.." was not correct")
+    fin,
+    SimpleFun(16)
+]
+
+
+/* Last check */  
+imprimir/*pretty god*/(evil_array[0]../**/" "..evil_array[1]..'/**/ '..evil_array[2]/* */(145)..evil_array[/**/4/**/-1])
+
