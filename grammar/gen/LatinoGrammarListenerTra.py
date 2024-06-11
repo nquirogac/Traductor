@@ -6,23 +6,37 @@ else:
     from LatinoGrammarParser import LatinoGrammarParser
 
 # This class defines a complete listener for a parse tree produced by LatinoGrammarParser.
-class LatinoGrammarListener(ParseTreeListener):
+class LatinoGrammarListenerTra(ParseTreeListener):
 
     # Enter a parse tree produced by LatinoGrammarParser#source.
     def enterSource(self, ctx:LatinoGrammarParser.SourceContext):
+        self.jsCode=''
+        self.expr=''
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#source.
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
+        print("----JS CODE----")
+        print(self.jsCode)
         pass
 
 
     # Enter a parse tree produced by LatinoGrammarParser#sentence.
     def enterSentence(self, ctx:LatinoGrammarParser.SentenceContext):
+        self.sent = ''
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#sentence.
     def exitSentence(self, ctx:LatinoGrammarParser.SentenceContext):
+        if ctx.parentCtx.getRuleIndex() == 26:
+            self.sentence.append(self.sent+'\n')
+        elif ctx.parentCtx.getRuleIndex() == 27:
+            self.altSentences.append(self.sent+'\n')
+        elif ctx.parentCtx.getRuleIndex() == 28:
+            self.altSentences.append(self.sent+'\n')
+        else:
+            self.jsCode += self.sent+'\n'
+        self.sent=''
         pass
 
 
@@ -32,6 +46,8 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Exit a parse tree produced by LatinoGrammarParser#assignableID.
     def exitAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
+        #Temporal a la espera de asignaciones multiples
+        self.sent+= ctx.getText()
         pass
 
 
@@ -64,24 +80,38 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by LatinoGrammarParser#assig.
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
+        self.sent+=ctx.ASSIGN_OP().getText()
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#assig.
     def exitAssig(self, ctx:LatinoGrammarParser.AssigContext):
+
         pass
 
 
     # Enter a parse tree produced by LatinoGrammarParser#exp.
     def enterExp(self, ctx:LatinoGrammarParser.ExpContext):
+
+        if ctx.parentCtx.getRuleIndex() == 26 or ctx.parentCtx.getRuleIndex() == 27:
+            self.expr='('
+
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#exp.
     def exitExp(self, ctx:LatinoGrammarParser.ExpContext):
+        if ctx.parentCtx.getRuleIndex() == 26:
+            self.exprBool = self.expr + ')'
+        elif ctx.parentCtx.getRuleIndex() == 27:
+            self.altExpBool = self.expr + ')'
+        else:
+            self.sent += self.expr
+        self.expr = ''
         pass
 
 
     # Enter a parse tree produced by LatinoGrammarParser#binaryOp.
     def enterBinaryOp(self, ctx:LatinoGrammarParser.BinaryOpContext):
+        self.expr += ctx.getChild(0).getText()+' '
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#binaryOp.
@@ -91,6 +121,13 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by LatinoGrammarParser#terminal.
     def enterTerminal(self, ctx:LatinoGrammarParser.TerminalContext):
+        #TODO verificar cada caso de los terminales
+        term = ctx.getText()
+        if term == 'verdadero' or term == 'cierto':
+            term = 'true'
+        if term == 'falso':
+            term = 'false'
+        self.expr += term+' '
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#terminal.
@@ -122,6 +159,7 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Exit a parse tree produced by LatinoGrammarParser#functionCall.
     def exitFunctionCall(self, ctx:LatinoGrammarParser.FunctionCallContext):
+        self.sent+=ctx.getText()
         pass
 
 
@@ -190,10 +228,12 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by LatinoGrammarParser#codeBlock.
     def enterCodeBlock(self, ctx:LatinoGrammarParser.CodeBlockContext):
+        self.codeBlock=''
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#codeBlock.
     def exitCodeBlock(self, ctx:LatinoGrammarParser.CodeBlockContext):
+        self.sent+=self.codeBlock
         pass
 
 
@@ -244,30 +284,42 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by LatinoGrammarParser#conditionalBlock.
     def enterConditionalBlock(self, ctx:LatinoGrammarParser.ConditionalBlockContext):
+        print(ctx.getChildCount())
+        self.exprBool = ''
+        self.sentence = []
+        self.altConditions = []
+        self.noCond = ''
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#conditionalBlock.
     def exitConditionalBlock(self, ctx:LatinoGrammarParser.ConditionalBlockContext):
+        if ctx.IF() is not None:
+            self.codeBlock += (f'if {self.exprBool}' + "{\n\t" + "\t".join(self.sentence)+"}"
+                               + ''.join(self.altConditions) + self.noCond)
         pass
-
 
     # Enter a parse tree produced by LatinoGrammarParser#altCondition.
     def enterAltCondition(self, ctx:LatinoGrammarParser.AltConditionContext):
+        self.altSentences = []
+        self.altExpBool = ''
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#altCondition.
     def exitAltCondition(self, ctx:LatinoGrammarParser.AltConditionContext):
+        self.altConditions.append(f'else if {self.altExpBool}' + '{\n\t' + "\t".join(self.altSentences)+"}")
         pass
 
 
     # Enter a parse tree produced by LatinoGrammarParser#noCondition.
     def enterNoCondition(self, ctx:LatinoGrammarParser.NoConditionContext):
+        self.altSentences = []
+
         pass
 
     # Exit a parse tree produced by LatinoGrammarParser#noCondition.
     def exitNoCondition(self, ctx:LatinoGrammarParser.NoConditionContext):
+        self.noCond+='else' + '{\n\t' + "\t".join(self.altSentences)+"}"
         pass
-
 
     # Enter a parse tree produced by LatinoGrammarParser#switchBlock.
     def enterSwitchBlock(self, ctx:LatinoGrammarParser.SwitchBlockContext):
