@@ -1,5 +1,5 @@
 
-def enterSentenceFunc(LatinoToJSInstance, ctx):
+def enterAssignationSentence(LatinoToJSInstance, ctx):
     variable = ctx.assignableID().ID().getText()
     is_assig = bool(ctx.assig().ASSIGN())
     
@@ -10,7 +10,7 @@ def enterSentenceFunc(LatinoToJSInstance, ctx):
     if variable:
         LatinoToJSInstance.jsCode += variable
 
-def enterAssignationFunc(LatinoToJSInstance, ctx):
+def enterAssignationRule(LatinoToJSInstance, ctx):
     variables = [i.getText() for i in ctx.assignableID()]
     operator = ctx.ASSIGN().getText() if ctx.ASSIGN() else ctx.ASSIGN_OP().getText()
 

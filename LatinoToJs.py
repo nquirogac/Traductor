@@ -18,13 +18,32 @@ class LatinoToJs(LatinoGrammarListener):
         }
 
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
-        enterSentenceFunc(self, ctx)
+        # Determine what function to use based on what rule will be applied
+        
+        if ctx.assig():
+            enterAssignationSentence(self, ctx)
+        elif ctx.functionCall():
+            print('Function calls need to go here')
+        elif ctx.R_UNARY_OP():
+            print('R_UNARY_OPS need to go here')
+        elif ctx.builtInFuncSentence():
+            print('Built in sentences go here')
+        elif ctx.functionReturn():
+            print('Function return goes here')
+        elif ctx.doWhileBlock():
+            print('Do while goes here')
+        elif ctx.codeBlock():
+            print('Do while goes here')
+        elif ctx.opBuiltInTipo():
+            print('Do while goes here')
+        else:
+            print('BREAK goes here')
 
     def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         self.jsCode += '\n'
 
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
-        enterAssignationFunc(self, ctx)
+        enterAssignationRule(self, ctx)
 
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
         print("----------------------JS CODE----------------------")
