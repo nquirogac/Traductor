@@ -61,7 +61,7 @@ doWhileBlock                : DO_WHILE_START (sentence)+ DO_WHILE_END exp;
 conditionalBlock            : IF  exp sentence+ (ELSE_IF exp sentence+)* (ELSE sentence+)?;
 switchBlock                 : SWITCH exp switchCasesDef;
 switchCasesDef              :
-                             ((CASE exp COLON)+ (sentence)+ switchCasesDef) |
+                             ((CASE exp COLON)+ (sentence)+ switchCasesDef*) |
                              DEF_CASE COLON sentence+;
 
 //TOKENS
