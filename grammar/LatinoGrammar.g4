@@ -14,7 +14,9 @@ assignableID                : ID assignableIDModifiers*;
 assignableIDModifiers       : listAccess | propertyAccess;
 listAccess                  : OPENING_BRA exp CLOSING_BRA;
 propertyAccess              : PERIOD ID;
-assig                       : (COMMA assignableID)* ASSIGN_OP assignableExp (COMMA assignableExp)*;
+assig                       :
+                             (COMMA assignableID)* ASSIGN assignableExp (COMMA assignableExp)* |
+                             ASSIGN_OP assignableExp;
 exp                         : terminal binaryOp*;
 binaryOp                    : (L_UNARY_OP | NUMERIC_OP | LOGIC_OP | STRING_OP) terminal;
 terminal                    :
@@ -69,7 +71,8 @@ L_UNARY_OP              : '+' | '-' | '!';
 NUMERIC_OP              : '*' | '/' | '%' | '^';
 LOGIC_OP                : '&&' | '||' | '==' | '!=' | '<=' | '>=' | '>' | '<';
 STRING_OP               : '..' | '~=';
-ASSIGN_OP               : '%=' | '/=' |'*=' | '-=' | '+=' | '=';
+ASSIGN                  : '=';
+ASSIGN_OP               : '%=' | '/=' |'*=' | '-=' | '+=';
 BOOLEAN_VALS            : 'verdadero' | 'cierto' | 'falso';
 NULL_VAL                : 'nulo';
 OP_BUILTIN_FUNCS_ARG    : 'anumero' | 'acadena' | 'alogico' | 'tipo';
