@@ -19,7 +19,10 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         # Determine what function to use based on what rule will be applied
-        
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '    
+
         if ctx.assig():
             enterAssignationSentence(self, ctx)
         elif ctx.functionCall():
@@ -64,10 +67,8 @@ class LatinoToJs(LatinoGrammarListener):
             string_replacement += f'{operator}?~terminal'
         if '?~skip' not in self.jsCode:
             self.jsCode = self.jsCode.replace('?~exp', string_replacement, 1)
-        #print(self.jsCode)
 
     def enterTerminal(self, ctx:LatinoGrammarParser.TerminalContext):
-        #print(1, ctx.getText(), self.jsCode)
         string_to_replace = ''
         # TODO: complete the cases, hopefully it won't become spaghetti
         if '?~skip' in self.jsCode:
@@ -89,12 +90,21 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.opBuiltInTipo():
             string_to_replace = '?~opBT'
         self.jsCode = self.jsCode.replace('?~terminal', string_to_replace, 1)
-        #print(2, self.jsCode)
 
     def enterOpBuiltInTipo(self, ctx:LatinoGrammarParser.OpBuiltInTipoContext):
         enterOpBuiltInTipoRule(self, ctx)
 
-    
+    def enterFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
+        enterFunctionBlockRule(self, ctx)
+
+    def exitFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
+        exitFunctionBlockRule(self, ctx)
+
+    def enterFunctionReturn(self, ctx:LatinoGrammarParser.FunctionReturnContext):
+        enterFunctionReturnRule(self, ctx)
+
+    def enterFunctionCall(self, ctx:LatinoGrammarParser.FunctionCallContext):
+        enterFunctionCallRule(self, ctx)
     
     def enterBuiltInFuncSentence(self, ctx:LatinoGrammarParser.BuiltInFuncSentenceContext):
         enterBuiltInFuncSentenceRule(self, ctx)

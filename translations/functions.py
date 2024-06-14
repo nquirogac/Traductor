@@ -25,6 +25,32 @@ def enterBuiltInFuncSentenceRule(self,ctx):
     elif ctx.BUILTIN_FUNC_MULTI_ARG():
         self.jsCode += 'console.log(?~PrintArgs)'
 
+def enterFunctionBlockRule(self, ctx):
+    number_ids = len([i.getText() for i in ctx.ID()])
+    print(1, self.jsCode)
+    self.jsCode += 'function ' + ctx.ID(0).getText() + '('
+    self.indentationStack.append(1)
+    if number_ids == 1:
+        self.jsCode += '){ \n'
+    else:
+        for i in range(1, number_ids):
+            self.jsCode += ctx.ID(i).getText() + ', '
+        self.jsCode = self.jsCode[:-2]
+        self.jsCode += '){ \n'
+
+def enterFunctionReturnRule(self, ctx):
+        self.jsCode += 'return ?~exp'
+
+def exitFunctionBlockRule(self, ctx):
+    if len(self.indentationStack)>0:
+        for i in range(len(self.indentationStack)-1):
+            self.jsCode += '    '
+    self.jsCode += '}'
+    self.indentationStack.pop()
+
+def enterFunctionCallRule(self, ctx):
+    self.jsCode += f'({ctx.optionalAssignableExpConcat().getText()})'
+
 def defineArgsPrint(self, ctx):
     args = ctx.getText()
     
