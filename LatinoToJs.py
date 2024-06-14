@@ -136,6 +136,7 @@ class LatinoToJs(LatinoGrammarListener):
         enterSwitchCases(self, ctx)
 
     def exitSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
+        exitSwitchCases(self,ctx)
         pass
 
     def exitSource(self, ctx: LatinoGrammarParser.SourceContext):
