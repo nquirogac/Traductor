@@ -51,6 +51,13 @@ def exitFunctionBlockRule(self, ctx):
 def enterFunctionCallRule(self, ctx):
     self.jsCode += f'({ctx.optionalAssignableExpConcat().getText()})'
 
+def enterAnonymousFuncDefRule(self, ctx):
+    self.jsCode += 'function('
+    for i in ctx.ID():
+        self.jsCode += i.getText() + ', '
+    self.jsCode = self.jsCode[:-2]
+    
+
 def defineArgsPrint(self, ctx):
     args = ctx.getText()
     

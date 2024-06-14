@@ -28,5 +28,5 @@ def enterAssignationRule(LatinoToJSInstance, ctx):
             LatinoToJSInstance.jsCode += f' {operator} ?~exp'
             #print(LatinoToJSInstance.jsCode)
 
-    LatinoToJSInstance.jsCode += ';'
+    #LatinoToJSInstance.jsCode += ';'
     #print(LatinoToJSInstance.jsCode)

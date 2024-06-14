@@ -2,6 +2,7 @@ from grammar.gen.LatinoGrammarListener import LatinoGrammarListener
 from grammar.gen.LatinoGrammarParser import LatinoGrammarParser
 from translations.assignations import *
 from translations.functions import *
+from translations.structures import *
 
 class LatinoToJs(LatinoGrammarListener):
 
@@ -38,6 +39,7 @@ class LatinoToJs(LatinoGrammarListener):
         
 
     def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
+        
         if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
             self.jsCode += ';'
         self.jsCode += '\n'
@@ -78,7 +80,10 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.STRING():
             string_to_replace = ctx.STRING().getText()
         elif ctx.ID():
-            string_to_replace = ctx.ID().getText()
+            if ctx.assignableIDModifiers():
+                string_to_replace = ctx.ID().getText() + '?~modifier'
+            else:
+                string_to_replace = ctx.ID().getText()
         elif ctx.BOOLEAN_VALS():
             string_to_replace = self.boolean_and_null_translation[ctx.BOOLEAN_VALS().getText()]
         elif ctx.NULL_VAL():
@@ -108,6 +113,27 @@ class LatinoToJs(LatinoGrammarListener):
     
     def enterBuiltInFuncSentence(self, ctx:LatinoGrammarParser.BuiltInFuncSentenceContext):
         enterBuiltInFuncSentenceRule(self, ctx)
+
+    def enterListDefinition(self, ctx:LatinoGrammarParser.ListDefinitionContext):
+        enterListDefRule(self, ctx)
+
+    def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
+        enterAnonymousFuncDefRule(self, ctx)
+
+    def exitAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
+        self.jsCode += '}'
+
+    def enterListAccess(self, ctx:LatinoGrammarParser.ListAccessContext):
+        self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')
+
+    def enterPropertyAccess(self, ctx:LatinoGrammarParser.PropertyAccessContext):
+        if '?~modifier' in self.jsCode:
+            self.jsCode = self.jsCode.replace('?~modifier', ctx.getText())
+        else:
+            self.jsCode += f'.{ctx.ID().getText()}'
+        
+    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDModifiersContext):
+        self.jsCode += ctx.ID().getText()
 
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
         print("----------------------JS CODE----------------------")
