@@ -115,25 +115,85 @@ def enterForRangeBlockRule(self, ctx):
 
     if not self.rangeCreated:
         self.jsCode += 'function range(start, end, step) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    if (end === undefined) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        end = start;\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        start = 0;\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    }\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    if (step === undefined) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        step = 1;\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    }\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    let result = [];\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    if (step > 0) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        for (let i = start; i < end; i += step) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '            result.push(i);\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        }\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    } else {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        for (let i = start; i > end; i += step) {\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '            result.push(i);\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '        }\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    }\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '    return result;\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
         self.jsCode += '}\n'
+        if self.indentationStack:
+            for i in range(len(self.indentationStack)):
+                self.jsCode += '    '
 
         self.rangeCreated = True
 
