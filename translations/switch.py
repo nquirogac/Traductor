@@ -13,8 +13,11 @@ def enterSwitchCases(latinoToJSInstance, ctx: LatinoGrammarParser.SwitchCasesDef
     init_case = ''
     if ctx.parentCtx.getRuleIndex() == LatinoGrammarParser.RULE_switchCasesDef:
         init_case += 'break;\n'
-    for i in range(len(ctx.CASE())):
-        init_case += f'case {ctx.exp(i).getText()}:\n'
+    if len(ctx.CASE())>0:
+        for i in range(len(ctx.CASE())):
+            init_case += f'case {ctx.exp(i).getText()}:\n'
+    elif ctx.DEF_CASE() != None:
+        init_case += f'default:\n'
     latinoToJSInstance.jsCode += init_case
 
 def exitSwitchCases(latinoToJSInstance, ctx: LatinoGrammarParser.SwitchCasesDefContext):
