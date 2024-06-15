@@ -1,8 +1,9 @@
 def enterListDefRule(self, ctx):
     self.jsCode += '['
-    elements = ctx.optAssigExpConcatWithTrail().getText().split(',')
+    elements = [i.getText() for i in ctx.optAssigExpConcatWithTrail().assignableExp()]
+
     for i in range(len(elements)):
-        self.jsCode += '?~exp, '
-    self.jsCode = self.jsCode[:-2]
+        if elements[i] != '':
+            self.jsCode += '?~exp, ' if i < len(elements)-1 else '?~exp'
     self.jsCode += ']'
 
