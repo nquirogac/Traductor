@@ -27,7 +27,6 @@ def enterBuiltInFuncSentenceRule(self,ctx):
 
 def enterFunctionBlockRule(self, ctx):
     number_ids = len([i.getText() for i in ctx.ID()])
-    print(1, self.jsCode)
     self.jsCode += 'function ' + ctx.ID(0).getText() + '('
     self.indentationStack.append(1)
     if number_ids == 1:
@@ -39,6 +38,9 @@ def enterFunctionBlockRule(self, ctx):
         self.jsCode += '){ \n'
 
 def enterFunctionReturnRule(self, ctx):
+    if '?~return' in self.jsCode:
+        self.jsCode = self.jsCode.replace('?~return', f'return ?~exp')
+    else:
         self.jsCode += 'return ?~exp'
 
 def exitFunctionBlockRule(self, ctx):
@@ -49,16 +51,22 @@ def exitFunctionBlockRule(self, ctx):
     self.indentationStack.pop()
 
 def enterFunctionCallRule(self, ctx):
-    if '?~funCall)' in self.jsCode:
-        self.jsCode = self.jsCode.replace('?~funCall)', '')
+    if '?~funCall' in self.jsCode:
+        if ctx.optionalAssignableExpConcat().getText() == '':
+            self.jsCode = self.jsCode.replace('?~funCall', '')
+        else:
+            self.jsCode = self.jsCode.replace('?~funCall', f'{ctx.optionalAssignableExpConcat().getText()}')
+    elif '?~nestedFunCall' in self.jsCode:
+        self.jsCode = self.jsCode.replace('?~nestedFunCall', '')
     else:    
         self.jsCode += f'({ctx.optionalAssignableExpConcat().getText()})'
 
 def enterAnonymousFuncDefRule(self, ctx):
-    self.jsCode += 'function('
+    expression = 'function('
     for i in ctx.ID():
-        self.jsCode += i.getText() + ', '
-    self.jsCode = self.jsCode[:-2]
+        expression += i.getText() + ', '
+    expression = expression[:-2] + '){ ?~exp }'
+    self.jsCode = self.jsCode.replace('?~anonFunc', expression)
     
 
 def defineArgsPrint(self, ctx):

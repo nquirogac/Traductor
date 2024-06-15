@@ -26,12 +26,16 @@ class LatinoToJs(LatinoGrammarListener):
 
         if ctx.assig():
             enterAssignationSentence(self, ctx)
+        elif ctx.assignableID():
+            if '.' not in ctx.assignableID().getText():
+                self.jsCode += ctx.assignableID().getText()
+            
         elif ctx.functionCall():
             print('Function calls need to go here')
         elif ctx.R_UNARY_OP():
             print('R_UNARY_OPS need to go here')
         elif ctx.functionReturn():
-            print('Function return goes here')
+            self.jsCode = self.jsCode.replace('?~exp', '?~return', 1)
         elif ctx.doWhileBlock():
             print('Do while goes here')
         elif ctx.codeBlock():
@@ -47,13 +51,13 @@ class LatinoToJs(LatinoGrammarListener):
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
 
+    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
+        self.jsCode += ctx.ID().getText()
+
     def enterExp(self, ctx:LatinoGrammarParser.ExpContext):
         if '?~PrintArgs' in self.jsCode:
             defineArgsPrint(self, ctx)
-        print(1,self.jsCode)
-        print(ctx.getText())
         string_replacement = f'?~terminal'
-        
         # Add terminal placeholders if there are binary operations
         operator = ''
         # TODO: translation of string operators
@@ -70,11 +74,10 @@ class LatinoToJs(LatinoGrammarListener):
             string_replacement += f'{operator}?~terminal'
         if '?~skip' not in self.jsCode:
             self.jsCode = self.jsCode.replace('?~exp', string_replacement, 1)
+        
 
     def enterTerminal(self, ctx:LatinoGrammarParser.TerminalContext):
         string_to_replace = ''
-        print(2,self.jsCode)
-        print('terminal',ctx.getText())
         # TODO: complete the cases, hopefully it won't become spaghetti
         if '?~skip' in self.jsCode:
             self.jsCode = self.jsCode.replace('?~skip', '')
@@ -86,9 +89,11 @@ class LatinoToJs(LatinoGrammarListener):
             if ctx.assignableIDModifiers():
                 if ctx.functionCall():
                     #string_to_replace = ctx.getText() + '?~funCall)'
-                    string_to_replace = ctx.ID().getText() + '[?~exp](?~exp)' + '?~funCall)'
+                    string_to_replace = ctx.ID().getText() + '[?~exp](?~exp)?~nestedFunCall' 
                 else:
                     string_to_replace = ctx.ID().getText() + '?~modifier'
+            elif ctx.functionCall() and not ctx.assignableIDModifiers():
+                string_to_replace = ctx.ID().getText() + '(?~funCall)'
             else:
                 string_to_replace = ctx.ID().getText()
         elif ctx.BOOLEAN_VALS():
@@ -127,9 +132,6 @@ class LatinoToJs(LatinoGrammarListener):
     def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
         enterAnonymousFuncDefRule(self, ctx)
 
-    def exitAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
-        self.jsCode += '}'
-
     def enterListAccess(self, ctx:LatinoGrammarParser.ListAccessContext):
         self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')
 
@@ -142,6 +144,10 @@ class LatinoToJs(LatinoGrammarListener):
     def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDModifiersContext):
         if ctx.assignableIDModifiers():
             self.jsCode += ctx.ID().getText()
+
+    def enterAssignableExp(self, ctx:LatinoGrammarParser.AssignableExpContext):
+        if ctx.anonymousFuncDef():
+            self.jsCode = self.jsCode.replace('?~exp', '?~anonFunc', 1)
 
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
         print("----------------------JS CODE----------------------")
