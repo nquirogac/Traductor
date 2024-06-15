@@ -49,7 +49,10 @@ def exitFunctionBlockRule(self, ctx):
     self.indentationStack.pop()
 
 def enterFunctionCallRule(self, ctx):
-    self.jsCode += f'({ctx.optionalAssignableExpConcat().getText()})'
+    if '?~funCall)' in self.jsCode:
+        self.jsCode = self.jsCode.replace('?~funCall)', '')
+    else:    
+        self.jsCode += f'({ctx.optionalAssignableExpConcat().getText()})'
 
 def enterAnonymousFuncDefRule(self, ctx):
     self.jsCode += 'function('
