@@ -35,7 +35,10 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.R_UNARY_OP():
             print('R_UNARY_OPS need to go here')
         elif ctx.functionReturn():
-            self.jsCode = self.jsCode.replace('?~exp', '?~return', 1)
+            if '?~sentence' in self.jsCode:
+                self.jsCode = self.jsCode.replace('?~sentence', '?~return', 1)
+            else:
+                self.jsCode += '?~return'
         elif ctx.doWhileBlock():
             print('Do while goes here')
         elif ctx.codeBlock():
@@ -88,7 +91,6 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.ID():
             if ctx.assignableIDModifiers():
                 if ctx.functionCall():
-                    #string_to_replace = ctx.getText() + '?~funCall)'
                     string_to_replace = ctx.ID().getText() + '[?~exp](?~exp)?~nestedFunCall' 
                 else:
                     string_to_replace = ctx.ID().getText() + '?~modifier'
@@ -106,6 +108,8 @@ class LatinoToJs(LatinoGrammarListener):
             string_to_replace = f'{ctx.L_UNARY_OP().getText()}?~exp'
         elif ctx.opBuiltInTipo():
             string_to_replace = '?~opBT'
+        elif ctx.listDefinition():
+            string_to_replace = '?~listDef'
         self.jsCode = self.jsCode.replace('?~terminal', string_to_replace, 1)
 
     def enterOpBuiltInTipo(self, ctx:LatinoGrammarParser.OpBuiltInTipoContext):
@@ -129,8 +133,10 @@ class LatinoToJs(LatinoGrammarListener):
     def enterListDefinition(self, ctx:LatinoGrammarParser.ListDefinitionContext):
         enterListDefRule(self, ctx)
 
+
     def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
         enterAnonymousFuncDefRule(self, ctx)
+
 
     def enterListAccess(self, ctx:LatinoGrammarParser.ListAccessContext):
         self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')

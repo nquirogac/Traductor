@@ -71,10 +71,16 @@ def enterFunctionCallRule(self, ctx):
 
 
 def enterAnonymousFuncDefRule(self, ctx):
-    expression = 'function('
-    for i in ctx.ID():
-        expression += i.getText() + ', '
-    expression = expression[:-2] + '){ ?~exp }'
+    expression = 'function ('
+    ids = [i.getText() for i in ctx.ID()]
+    for i in range(len(ids)):
+        expression += f'{ids[i]}, ' if i < len(ids) - 1 else f'{ids[i]}'
+    expression += ') { \n'
+    n_sentences = len(ctx.sentence())
+
+    for i in range(n_sentences):
+        expression += '?~sentence'
+    expression += '\n}'
     self.jsCode = self.jsCode.replace('?~anonFunc', expression)
     
 
