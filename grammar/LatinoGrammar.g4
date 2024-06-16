@@ -29,7 +29,6 @@ terminal                    :
                              L_UNARY_OP exp |
                              opBuiltInTipo |
                              OP_BUILTIN_FUNCS_NO_ARG OPENING_PAR CLOSING_PAR |
-                             anonymousFuncDef |
                              listDefinition |
                              dictDefinition;
 opBuiltInTipo               : OP_BUILTIN_FUNCS_ARG OPENING_PAR assignableExp CLOSING_PAR;
@@ -55,13 +54,15 @@ codeBlock                   : (
                             ) BLOCK_END;
 functionBlock               : FUNC_KEYWORD ID OPENING_PAR (ID (COMMA ID)*)? CLOSING_PAR sentence+;
 whileBlock                  : WHILE exp (sentence)+;
-forBlock                    : FOR OPENING_PAR assignableID ASSIGN_OP exp SEMICOLON exp SEMICOLON sentence CLOSING_PAR sentence+;
+forBlock                    : FOR OPENING_PAR assignableID (ASSIGN_OP | ASSIGN) exp SEMICOLON exp SEMICOLON sentence CLOSING_PAR sentence+;
 forRangeBlock               : FOR_RANGE ID IN RANGE OPENING_PAR exp (COMMA exp)? (COMMA exp)? CLOSING_PAR (sentence)+;
 doWhileBlock                : DO_WHILE_START (sentence)+ DO_WHILE_END exp;
-conditionalBlock            : IF  exp sentence+ (ELSE_IF exp sentence+)* (ELSE sentence+)?;
+conditionalBlock            : IF  exp sentence+ altCondition* noCondition?;
+altCondition                : ELSE_IF exp sentence+;
+noCondition                 : ELSE sentence+;
 switchBlock                 : SWITCH exp switchCasesDef;
 switchCasesDef              :
-                             ((CASE exp COLON)+ (sentence)+ switchCasesDef) |
+                             ((CASE exp COLON)+ (sentence)+ switchCasesDef*) |
                              DEF_CASE COLON sentence+;
 
 //TOKENS
