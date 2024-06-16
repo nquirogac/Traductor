@@ -13,7 +13,7 @@ def exitSwitch(latinoToJSInstance, ctx: LatinoGrammarParser.SwitchBlockContext):
 def enterSwitchCases(latinoToJSInstance, ctx: LatinoGrammarParser.SwitchCasesDefContext):
     init_case = ''
     if ctx.parentCtx.getRuleIndex() == LatinoGrammarParser.RULE_switchCasesDef:
-        init_case += '\t'*latinoToJSInstance.indentationStack[-1]+'break;\n'
+        # init_case += '\t'*latinoToJSInstance.indentationStack[-1]+'break;\n'
         latinoToJSInstance.indentationStack.pop()
     if len(ctx.CASE())>0:
         for i in range(len(ctx.CASE())):
@@ -24,7 +24,7 @@ def enterSwitchCases(latinoToJSInstance, ctx: LatinoGrammarParser.SwitchCasesDef
 
     for _ in ctx.sentence():
         init_case += '?~sentence'
-
+    init_case += '\t'*(latinoToJSInstance.indentationStack[-1]+1)+'break;\n'
     for _ in ctx.switchCasesDef():
         init_case += '?~switchCases'
 
