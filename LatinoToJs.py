@@ -162,6 +162,10 @@ class LatinoToJs(LatinoGrammarListener):
         enterDictDefRule(self, ctx)
 
 
+    def exitDictDefinition(self, ctx:LatinoGrammarParser.DictDefinitionContext):
+        exitDictDefRule(self, ctx)
+
+
     def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
         enterAnonymousFuncDefRule(self, ctx)
 
