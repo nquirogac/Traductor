@@ -4,7 +4,7 @@ def enterOpBuiltInTipoRule(self, ctx):
     if operation == 'anumero':
         operation = 'parseFloat(?~exp)'
     elif operation == 'acadena':
-        operation = '(?~exp).toString()'
+        operation = 'String(?~exp)'
     elif operation == 'alogico':
         operation = 'Boolean(?~exp)'
     elif operation == 'tipo':
