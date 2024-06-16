@@ -6,6 +6,7 @@ from translations.conditional import *
 from translations.switch import *
 
 from translations.functions import *
+from translations.structures import *
 
 
 class LatinoToJs(LatinoGrammarListener):
@@ -35,6 +36,10 @@ class LatinoToJs(LatinoGrammarListener):
 
         if ctx.assig():
             enterAssignationSentence(self, ctx)
+        elif ctx.assignableID():
+            if '.' not in ctx.assignableID().getText():
+                self.jsCode += ctx.assignableID().getText()
+            
         elif ctx.functionCall():
             print('Function calls need to go here')
         elif ctx.R_UNARY_OP():
@@ -48,7 +53,10 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.builtInFuncSentence():
             print('Built in sentences go here')
         elif ctx.functionReturn():
-            print('Function return goes here')
+            if '?~sentence' in self.jsCode:
+                self.jsCode = self.jsCode.replace('?~sentence', '?~return', 1)
+            else:
+                self.jsCode += '?~return'
         elif ctx.doWhileBlock():
             print('Do while goes here')
         elif ctx.codeBlock():
@@ -61,17 +69,27 @@ class LatinoToJs(LatinoGrammarListener):
 
 
     def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
+        
+        if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
+            self.jsCode += ';'
+        self.jsCode += '\n'
+
         if not self.infor:
             self.jsCode += '\n'
         self.infor = False
 
+
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
 
+    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
+        self.jsCode += ctx.ID().getText()
+
     def enterExp(self, ctx:LatinoGrammarParser.ExpContext):
+        if '?~PrintArgs' in self.jsCode:
+            defineArgsPrint(self, ctx)
 
         string_replacement = f'?~terminal'
-
         # Add terminal placeholders if there are binary operations
         operator = ''
         # TODO: translation of string operators
@@ -85,9 +103,15 @@ class LatinoToJs(LatinoGrammarListener):
             else:
                 operator = binary_op.STRING_OP().getText()
 
-            string_replacement += f' {operator} ?~terminal'
+
+            string_replacement += f'{operator}?~terminal'
+        if '?~skip' not in self.jsCode:
+            self.jsCode = self.jsCode.replace('?~exp', string_replacement, 1)
+        
+
 
         self.jsCode = self.jsCode.replace('?~exp', string_replacement, 1)
+
 
     def enterTerminal(self, ctx:LatinoGrammarParser.TerminalContext):
 
@@ -97,6 +121,18 @@ class LatinoToJs(LatinoGrammarListener):
             string_to_replace = ctx.REAL().getText()
         elif ctx.STRING():
             string_to_replace = ctx.STRING().getText()
+
+        elif ctx.ID():
+            if ctx.assignableIDModifiers():
+                if ctx.functionCall():
+                    string_to_replace = ctx.ID().getText() + '[?~exp](?~exp)?~nestedFunCall' 
+                else:
+                    string_to_replace = ctx.ID().getText() + '?~modifier'
+            elif ctx.functionCall() and not ctx.assignableIDModifiers():
+                string_to_replace = ctx.ID().getText() + '(?~funCall)'
+            else:
+                string_to_replace = ctx.ID().getText()
+
         elif ctx.BOOLEAN_VALS():
             string_to_replace = self.boolean_and_null_translation[ctx.BOOLEAN_VALS().getText()]
         elif ctx.NULL_VAL():
@@ -104,7 +140,13 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.OPENING_PAR():
             string_to_replace = f'(?~exp)'
         elif ctx.L_UNARY_OP():
-            string_to_replace = f'{ctx.L_UNARY_OP().getText()} ?~exp'
+
+            string_to_replace = f'{ctx.L_UNARY_OP().getText()}?~exp'
+        elif ctx.opBuiltInTipo():
+            string_to_replace = '?~opBT'
+        elif ctx.listDefinition():
+            string_to_replace = '?~listDef'
+
         elif ctx.ID():
             string_to_replace = ctx.ID().getText()
 
@@ -129,6 +171,34 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterBuiltInFuncSentence(self, ctx:LatinoGrammarParser.BuiltInFuncSentenceContext):
         enterBuiltInFuncSentenceRule(self, ctx)
+
+
+    def enterListDefinition(self, ctx:LatinoGrammarParser.ListDefinitionContext):
+        enterListDefRule(self, ctx)
+
+
+    def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
+        enterAnonymousFuncDefRule(self, ctx)
+
+
+    def enterListAccess(self, ctx:LatinoGrammarParser.ListAccessContext):
+        self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')
+
+    def enterPropertyAccess(self, ctx:LatinoGrammarParser.PropertyAccessContext):
+        if '?~modifier' in self.jsCode:
+            self.jsCode = self.jsCode.replace('?~modifier', ctx.getText())
+        else:
+            self.jsCode += f'.{ctx.ID().getText()}'
+        
+    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDModifiersContext):
+        if ctx.assignableIDModifiers():
+            self.jsCode += ctx.ID().getText()
+
+    def enterAssignableExp(self, ctx:LatinoGrammarParser.AssignableExpContext):
+        if ctx.anonymousFuncDef():
+            self.jsCode = self.jsCode.replace('?~exp', '?~anonFunc', 1)
+
+  
 
     def enterConditionalBlock(self, ctx: LatinoGrammarParser.ConditionalBlockContext):
         enterConditional(self, ctx)
@@ -171,4 +241,5 @@ class LatinoToJs(LatinoGrammarListener):
 
     def exitForRangeBlock(self, ctx:LatinoGrammarParser.ForRangeBlockContext):
         exitForRangeBlockRule(self, ctx)
+
 
