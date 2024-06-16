@@ -16,40 +16,44 @@ def exitWhileBlockRule(self, ctx):
     self.indentationStack.pop()
 
 def enterDoWhileBlockRule(self, ctx):
-    self.jsCode += 'do {\n'
-    self.indentationStack.append(1)
+    exp = ctx.exp().getText()
+    string_to_replace = 'do {\n'
+    for _ in ctx.sentence():
+        string_to_replace += '?~sentence'
+
+    string_to_replace += self.indentationStack[-1]*'\t' + '}'
+    string_to_replace += ' while ?~exp' if exp[0] == '(' and exp[-1] == ')' else ' while (?~exp)'
+
+    self.indentationStack.append(self.indentationStack[-1]+1)
+    self.jsCode = self.jsCode.replace('?~doWhile', string_to_replace, 1)
 
 def exitDoWhileBlockRule(self, ctx):
-    exp = ctx.exp().getText()
-    if len(self.indentationStack) > 0:
-        for i in range(len(self.indentationStack) - 1):
-            self.jsCode += '    '
-    self.jsCode += '} '
-    self.jsCode += f'while exp mal:{exp}' if exp[0] == '(' and exp[-1] == ')' else f'while (exp mal:{exp})'
     self.indentationStack.pop()
 
 def enterForBlockRule(self, ctx):
     is_assig = ctx.ASSIGN() != None
+    string_replacement = ''
 
     variable = ctx.assignableID().getText()
     if is_assig and variable not in self.symbolArray:
         self.symbolArray.append(variable)
-        self.jsCode += f'for (let {ctx.assignableID().getText()} {ctx.ASSIGN().getText()} ?~exp; ?~exp; '
+        string_replacement += f'for (let {ctx.assignableID().getText()} {ctx.ASSIGN().getText()} ?~exp; ?~exp; ?~noTab?~sentence)'+' {\n'
     elif is_assig and variable in self.symbolArray:
-        self.jsCode += f'for ({ctx.assignableID().getText()}{ctx.ASSIGN().getText()}?~exp; ?~exp; '
+        string_replacement += f'for ({ctx.assignableID().getText()}{ctx.ASSIGN().getText()}?~exp; ?~exp; ?~noTab?~sentence)' + ' {\n'
     elif not is_assig:
-        self.jsCode += f'for ({ctx.assignableID().getText()}{ctx.ASSIGN_OP().getText()}?~exp; ?~exp; '
+        string_replacement += f'for ({ctx.assignableID().getText()}{ctx.ASSIGN_OP().getText()}?~exp; ?~exp; ?~noTab?~sentence)'+' {\n'
 
-    self.infor = True
+    for i in range(1, len(ctx.sentence())):
+        string_replacement += '?~sentence'
 
-    self.indentationStack.append(1)
+    string_replacement += self.indentationStack[-1]*'\t' + '}'
+
+    self.indentationStack.append(self.indentationStack[-1]+1)
+
+    self.jsCode = self.jsCode.replace('?~forBlock', string_replacement, 1)
 
 
 def exitForBlockRule(self, ctx):
-    if len(self.indentationStack) > 0:
-        for i in range(len(self.indentationStack) - 1):
-            self.jsCode += '    '
-    self.jsCode += '}'
     self.indentationStack.pop()
 
 def enterForRangeBlockRule(self, ctx):

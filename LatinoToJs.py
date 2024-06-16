@@ -30,6 +30,12 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         tabs = self.indentationStack[-1]*'\t'
+        lineEnd = ';\n'
+
+        if '?~noTab' in self.jsCode:
+            self.jsCode = self.jsCode.replace('?~noTab', '')
+            tabs = ''
+            lineEnd = ''
         # Determine what function to use based on what rule will be applied
         # if not self.infor:
         #     if self.indentationStack:
@@ -37,24 +43,25 @@ class LatinoToJs(LatinoGrammarListener):
         #             self.jsCode += '    '
 
         if ctx.assig():
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assig-sentence{lineEnd}', 1)
             enterAssignationSentence(self, ctx)
         elif ctx.R_UNARY_OP():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID{ctx.R_UNARY_OP().getText()};\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID{ctx.R_UNARY_OP().getText()}{lineEnd}', 1)
         elif ctx.functionCall():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID(?~funCall);\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID(?~funCall){lineEnd}', 1)
         elif ctx.functionReturn():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~return;\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~return{lineEnd}', 1)
         elif ctx.builtInFuncSentence():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~BI_Func;\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~BI_Func{lineEnd}', 1)
         elif ctx.opBuiltInTipo():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~opBT;\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~opBT{lineEnd}', 1)
         elif ctx.doWhileBlock():
-            print('Do while goes here')
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~doWhile{lineEnd}', 1)
         elif ctx.codeBlock():
             self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~codeBlock\n', 1)
         else:
             # The only remaining case is break
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}break;\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}break{lineEnd}', 1)
 
         
 
@@ -139,6 +146,8 @@ class LatinoToJs(LatinoGrammarListener):
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~conditionalBlock', 1)
         elif ctx.switchBlock():
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~switchBlock', 1)
+        elif ctx.forBlock():
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~forBlock', 1)
 
     def enterFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
         enterFunctionBlockRule(self, ctx)

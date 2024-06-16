@@ -11,9 +11,9 @@ def enterAssignationSentence(LatinoToJSInstance, ctx):
     if variable:
         string_replacement += variable
 
-    string_replacement += '?~assignation;\n'
+    string_replacement += '?~assignation'
 
-    LatinoToJSInstance.jsCode = LatinoToJSInstance.jsCode.replace('?~sentence', string_replacement, 1)
+    LatinoToJSInstance.jsCode = LatinoToJSInstance.jsCode.replace('?~assig-sentence', string_replacement, 1)
 
 def enterAssignationRule(LatinoToJSInstance, ctx):
     variables = ctx.assignableID()
