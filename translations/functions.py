@@ -62,11 +62,12 @@ def enterFunctionCallRule(self, ctx):
                 replacement_string += '?~exp, ' if i < n_expressions-1 else '?~exp'
             self.jsCode = self.jsCode.replace('?~funCall', f'{replacement_string}')
     elif '?~nestedFunCall' in self.jsCode:
+        self.jsCode = self.jsCode.replace('?~nestedFunCall', '')
+    else:
         n_expressions = len(ctx.optionalAssignableExpConcat().assignableExp())
         for i in range(n_expressions):
             replacement_string += '?~exp, ' if i < n_expressions - 1 else '?~exp'
-        self.jsCode = self.jsCode.replace('?~nestedFunCall', replacement_string)
-    else:    
+        self.jsCode = self.jsCode.replace('?~funCall', f'{replacement_string}')
         self.jsCode += f'({replacement_string})'
 
 
