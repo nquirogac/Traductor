@@ -137,7 +137,8 @@ class LatinoToJs(LatinoGrammarListener):
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~functionBlock', 1)
         elif ctx.conditionalBlock():
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~conditionalBlock', 1)
-
+        elif ctx.switchBlock():
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~switchBlock', 1)
 
     def enterFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
         enterFunctionBlockRule(self, ctx)
