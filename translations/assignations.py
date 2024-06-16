@@ -49,7 +49,7 @@ def enterAssignationRule(self, ctx):
 def enterWhileBlockRule(self, ctx):
     exp = ctx.exp().getText()
     #print(f"la expresion del while es: {exp}")
-    self.jsCode += f'while {exp}' if exp[0] == '(' and exp[-1] == ')' else f'while ({exp})'
+    self.jsCode += f'while ?~exp' if exp[0] == '(' and exp[-1] == ')' else f'while (?~exp)'
     self.jsCode += '{\n'
     self.indentationStack.append(1)
 
@@ -70,7 +70,7 @@ def exitDoWhileBlockRule(self, ctx):
         for i in range(len(self.indentationStack) - 1):
             self.jsCode += '    '
     self.jsCode += '} '
-    self.jsCode += f'while {exp}' if exp[0] == '(' and exp[-1] == ')' else f'while ({exp})'
+    self.jsCode += f'while ?~exp' if exp[0] == '(' and exp[-1] == ')' else f'while (?~exp)'
     self.indentationStack.pop()
 
 def enterForBlockRule(self, ctx):
