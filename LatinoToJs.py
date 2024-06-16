@@ -3,6 +3,8 @@ from grammar.gen.LatinoGrammarParser import LatinoGrammarParser
 from translations.assignations import *
 from translations.functions import *
 from translations.structures import *
+from translations.conditional import *
+from translations.switch import *
 
 class LatinoToJs(LatinoGrammarListener):
 
@@ -155,6 +157,30 @@ class LatinoToJs(LatinoGrammarListener):
         if ctx.anonymousFuncDef():
             self.jsCode = self.jsCode.replace('?~exp', '?~anonFunc', 1)
 
+    def enterConditionalBlock(self, ctx: LatinoGrammarParser.ConditionalBlockContext):
+        enterConditional(self, ctx)
+
+    def exitConditionalBlock(self, ctx: LatinoGrammarParser.ConditionalBlockContext):
+        exitConditional(self, ctx)
+
+    def enterAltCondition(self, ctx: LatinoGrammarParser.AltConditionContext):
+        enterAltConditional(self, ctx)
+
+    def enterNoCondition(self, ctx: LatinoGrammarParser.NoConditionContext):
+        enterNoConditional(self, ctx)
+
+    def enterSwitchBlock(self, ctx: LatinoGrammarParser.SwitchBlockContext):
+        enterSwitch(self, ctx)
+
+    def exitSwitchBlock(self, ctx: LatinoGrammarParser.SwitchBlockContext):
+        exitSwitch(self, ctx)
+
+    def enterSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
+        enterSwitchCases(self, ctx)
+
+    def exitSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
+        exitSwitchCases(self,ctx)
+        pass
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
         print("----------------------JS CODE----------------------")
         print(self.jsCode)
