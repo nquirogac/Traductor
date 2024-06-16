@@ -7,11 +7,12 @@ from translations.conditional import *
 from translations.switch import *
 from translations.loops import *
 
+
 class LatinoToJs(LatinoGrammarListener):
 
     def __init__(self):
         self.symbolArray = []  # Used to keep track of defined variables
-        self.indentationStack = []  # Use to keep indentation levels when nesting blocks
+        self.indentationStack = [0]  # Use to keep indentation levels when nesting blocks
         self.jsCode = ''
         self.passSemiColon = [';', '/', '}','\n']
         self.boolean_and_null_translation = {
@@ -23,50 +24,56 @@ class LatinoToJs(LatinoGrammarListener):
         self.rangeCreated = False
         self.infor = False
 
+    def enterSource(self, ctx:LatinoGrammarParser.SourceContext):
+        self.jsCode += '?~sentence'*len(ctx.sentence())
+
+
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
+        tabs = self.indentationStack[-1]*'\t'
         # Determine what function to use based on what rule will be applied
-        if not self.infor:
-            if self.indentationStack:
-                for i in range(len(self.indentationStack)):
-                    self.jsCode += '    '
+        # if not self.infor:
+        #     if self.indentationStack:
+        #         for i in range(len(self.indentationStack)):
+        #             self.jsCode += '    '
 
         if ctx.assig():
             enterAssignationSentence(self, ctx)
-        elif ctx.assignableID():
-            if '.' not in ctx.assignableID().getText():
-                self.jsCode += ctx.assignableID().getText()
-
-        if ctx.R_UNARY_OP():
-            self.jsCode += ctx.R_UNARY_OP().getText()
-            
+        elif ctx.R_UNARY_OP():
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID{ctx.R_UNARY_OP().getText()};\n', 1)
         elif ctx.functionCall():
-            print('Function calls need to go here')
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID(?~funCall);\n', 1)
         elif ctx.functionReturn():
-            if '?~sentence' in self.jsCode:
-                self.jsCode = self.jsCode.replace('?~sentence', '?~return', 1)
-            else:
-                self.jsCode += '?~return'
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~return;\n', 1)
+        elif ctx.builtInFuncSentence():
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~BI_Func;\n', 1)
+        elif ctx.opBuiltInTipo():
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~opBT;\n', 1)
         elif ctx.doWhileBlock():
             print('Do while goes here')
         elif ctx.codeBlock():
-            print('Do while goes here')
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~codeBlock\n', 1)
+        else:
+            # The only remaining case is break
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}break;\n', 1)
+
         
 
-    def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
-        if self.infor:
-            self.jsCode += '){\n'
-            self.infor = False
+    # def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
+        # if self.infor:
+        #     self.jsCode += '){\n'
+        #     self.infor = False
 
-        else:
-            if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
-                self.jsCode += ';'
-            self.jsCode += '\n'
+        # else:
+        #     if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
+        #         self.jsCode += ';'
+        #     self.jsCode += '\n'
+        # string_replacement = ''
+        # if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
+        #     string_replacement += ';'
+        # self.jsCode += '\n'
 
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
-
-    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
-        self.jsCode += ctx.ID().getText()
 
     def enterExp(self, ctx:LatinoGrammarParser.ExpContext):
         if '?~PrintArgs' in self.jsCode:
@@ -84,8 +91,8 @@ class LatinoToJs(LatinoGrammarListener):
                 operator = binary_op.LOGIC_OP().getText()
             else:
                 operator = binary_op.STRING_OP().getText().replace('..', '+')
+            string_replacement += f' {operator} ?~terminal'
 
-            string_replacement += f'{operator}?~terminal'
         if '?~skip' not in self.jsCode:
             self.jsCode = self.jsCode.replace('?~exp', string_replacement, 1)
         
@@ -100,15 +107,14 @@ class LatinoToJs(LatinoGrammarListener):
         elif ctx.STRING():
             string_to_replace = ctx.STRING().getText()
         elif ctx.ID():
-            if ctx.assignableIDModifiers():
-                if ctx.functionCall():
-                    string_to_replace = ctx.ID().getText() + '[?~exp](?~exp)?~nestedFunCall' 
-                else:
-                    string_to_replace = ctx.ID().getText() + '?~modifier'
-            elif ctx.functionCall() and not ctx.assignableIDModifiers():
-                string_to_replace = ctx.ID().getText() + '(?~funCall)'
-            else:
-                string_to_replace = ctx.ID().getText()
+            string_to_replace += ctx.ID().getText()
+
+            for modifier in ctx.assignableIDModifiers():
+                string_to_replace += '?~modifier'
+
+            if ctx.functionCall():
+                string_to_replace += '(?~funCall)'
+
         elif ctx.BOOLEAN_VALS():
             string_to_replace = self.boolean_and_null_translation[ctx.BOOLEAN_VALS().getText()]
         elif ctx.NULL_VAL():
@@ -125,6 +131,13 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterOpBuiltInTipo(self, ctx:LatinoGrammarParser.OpBuiltInTipoContext):
         enterOpBuiltInTipoRule(self, ctx)
+
+    def enterCodeBlock(self, ctx:LatinoGrammarParser.CodeBlockContext):
+        if ctx.functionBlock():
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~functionBlock', 1)
+        elif ctx.conditionalBlock():
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~conditionalBlock', 1)
+
 
     def enterFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
         enterFunctionBlockRule(self, ctx)
@@ -149,18 +162,21 @@ class LatinoToJs(LatinoGrammarListener):
         enterAnonymousFuncDefRule(self, ctx)
 
 
-    def enterListAccess(self, ctx:LatinoGrammarParser.ListAccessContext):
-        self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')
+    def exitAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
+        exitAnonymousFuncDefRule(self, ctx)
 
-    def enterPropertyAccess(self, ctx:LatinoGrammarParser.PropertyAccessContext):
-        if '?~modifier' in self.jsCode:
-            self.jsCode = self.jsCode.replace('?~modifier', ctx.getText())
-        else:
-            self.jsCode += f'.{ctx.ID().getText()}'
         
-    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDModifiersContext):
-        if ctx.assignableIDModifiers():
-            self.jsCode += ctx.ID().getText()
+    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
+        string_replacement = ctx.ID().getText()+'?~modifier'*len(ctx.assignableIDModifiers())
+
+        self.jsCode = self.jsCode.replace('?~assigID', string_replacement, 1)
+
+    def enterAssignableIDModifiers(self, ctx:LatinoGrammarParser.AssignableIDModifiersContext):
+        if ctx.listAccess():
+            self.jsCode = self.jsCode.replace('?~modifier', '[?~exp]')
+        else:
+            self.jsCode = self.jsCode.replace('?~modifier', ctx.propertyAccess().getText())
+
 
     def enterAssignableExp(self, ctx:LatinoGrammarParser.AssignableExpContext):
         if ctx.anonymousFuncDef():
@@ -175,8 +191,14 @@ class LatinoToJs(LatinoGrammarListener):
     def enterAltCondition(self, ctx: LatinoGrammarParser.AltConditionContext):
         enterAltConditional(self, ctx)
 
+    def exitAltCondition(self, ctx:LatinoGrammarParser.AltConditionContext):
+        exitAltConditional(self, ctx)
+
     def enterNoCondition(self, ctx: LatinoGrammarParser.NoConditionContext):
         enterNoConditional(self, ctx)
+
+    def exitNoCondition(self, ctx:LatinoGrammarParser.NoConditionContext):
+        exitNoConditional(self, ctx)
 
     def enterSwitchBlock(self, ctx: LatinoGrammarParser.SwitchBlockContext):
         enterSwitch(self, ctx)

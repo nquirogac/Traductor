@@ -9,32 +9,39 @@ def enterOpBuiltInTipoRule(self, ctx):
         operation = 'Boolean(?~exp)'
     elif operation == 'tipo':
         operation = 'typeof(?~exp)'
-    
-    if '?~opBT' in self.jsCode:
-        self.jsCode = self.jsCode.replace('?~opBT', operation)
-    else:
-        self.jsCode += f'{operation}'
 
+    self.jsCode = self.jsCode.replace('?~opBT', operation)
 
 def enterBuiltInFuncSentenceRule(self,ctx):
+    string_replacement = ''
     if ctx.BUILTIN_FUNC_SINGLE_ARG():
-        self.jsCode += 'console.log(?~exp)'
+        string_replacement += 'console.log(?~exp)'
     elif ctx.BUILTIN_FUNC_NO_ARG():
-        self.jsCode += 'clear()'
+        string_replacement += 'console.clear()'
     elif ctx.BUILTIN_FUNC_MULTI_ARG():
-        self.jsCode += 'console.log(?~PrintArgs)'
+        string_replacement += 'console.log(?~PrintArgs)'
+
+    self.jsCode = self.jsCode.replace('?~BI_Func', string_replacement)
 
 def enterFunctionBlockRule(self, ctx):
-    number_ids = len([i.getText() for i in ctx.ID()])
-    self.jsCode += 'function ' + ctx.ID(0).getText() + '('
-    self.indentationStack.append(1)
-    if number_ids == 1:
-        self.jsCode += '){ \n'
-    else:
-        for i in range(1, number_ids):
-            self.jsCode += ctx.ID(i).getText() + ', '
-        self.jsCode = self.jsCode[:-2]
-        self.jsCode += '){ \n'
+    ids = [i.getText() for i in ctx.ID()]
+    string_replacement = 'function '
+
+    for i in range(len(ids)):
+        if i == 0:
+            string_replacement += ids[i] + '('
+        else:
+            string_replacement += f'{ids[i]}, ' if i < len(ids) - 1 else ids[i]
+
+    string_replacement += ') {\n'
+
+    for _ in ctx.sentence():
+        string_replacement += '?~sentence'
+
+    string_replacement += self.indentationStack[-1]*'\t' + '}'
+    self.indentationStack.append(self.indentationStack[-1] + 1)
+
+    self.jsCode = self.jsCode.replace('?~functionBlock', string_replacement, 1)
 
 def enterFunctionReturnRule(self, ctx):
     if '?~return' in self.jsCode:
@@ -43,10 +50,6 @@ def enterFunctionReturnRule(self, ctx):
         self.jsCode += 'return ?~exp'
 
 def exitFunctionBlockRule(self, ctx):
-    if len(self.indentationStack)>0:
-        for i in range(len(self.indentationStack)-1):
-            self.jsCode += '    '
-    self.jsCode += '}'
     self.indentationStack.pop()
 
 
@@ -81,8 +84,13 @@ def enterAnonymousFuncDefRule(self, ctx):
 
     for i in range(n_sentences):
         expression += '?~sentence'
-    expression += '\n}'
+    expression += self.indentationStack[-1]*'\t' + '}'
+    self.indentationStack.append(self.indentationStack[-1] + 1)
     self.jsCode = self.jsCode.replace('?~anonFunc', expression)
+
+
+def exitAnonymousFuncDefRule(self, ctx):
+    self.indentationStack.pop()
     
 
 def defineArgsPrint(self, ctx):
