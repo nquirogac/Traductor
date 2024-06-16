@@ -4,8 +4,8 @@ from grammar.gen.LatinoGrammarLexer import LatinoGrammarLexer
 from grammar.gen.LatinoGrammarParser import LatinoGrammarParser
 from LatinoToJs import LatinoToJs
 
-#input_text = open("inputs/04.in", "r").read()
-input_text = sys.stdin.read()
+input_text = open("inputs/05.in", "r").read()
+#input_text = sys.stdin.read()
 lexer = LatinoGrammarLexer(InputStream(input_text))
 stream = CommonTokenStream(lexer)
 parser = LatinoGrammarParser(stream)

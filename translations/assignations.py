@@ -25,6 +25,7 @@ def enterAssignationRule(self, ctx):
             if len(assignable_expressions) > i:
                 self.jsCode += f' {operator} ?~exp'
 
+
         self.jsCode += ';'
 
     if self.infor:
@@ -218,3 +219,4 @@ def exitForRangeBlockRule(self, ctx):
             self.jsCode += '    '
     self.jsCode += '}'
     self.indentationStack.pop()
+
