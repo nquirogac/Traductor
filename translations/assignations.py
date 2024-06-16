@@ -36,6 +36,12 @@ def enterAssignationRule(LatinoToJSInstance, ctx):
             if assignable_expressions[i-1].anonymousFuncDef():
                 there_is_anonymous_func = True
 
-    if not there_is_anonymous_func:
-        string_replacement += ';'
+    if not '?~noEnd' in LatinoToJSInstance.jsCode and not there_is_anonymous_func:
+        string_replacement += ';\n'
+    elif there_is_anonymous_func:
+        string_replacement += '\n'
+
     LatinoToJSInstance.jsCode = LatinoToJSInstance.jsCode.replace('?~assignation', string_replacement, 1)
+
+    if '?~noEnd' in LatinoToJSInstance.jsCode:
+        LatinoToJSInstance.jsCode = LatinoToJSInstance.jsCode.replace('?~noEnd', '', 1)

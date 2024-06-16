@@ -38,7 +38,7 @@ class LatinoToJs(LatinoGrammarListener):
             lineEnd = ''
 
         if ctx.assig():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assig-sentence\n', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assig-sentence{"?~noEnd" if lineEnd == "" else ""}', 1)
             enterAssignationSentence(self, ctx)
         elif ctx.R_UNARY_OP():
             self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID{ctx.R_UNARY_OP().getText()}{lineEnd}', 1)
