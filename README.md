@@ -3,6 +3,12 @@ Este es un traductor del lenguaje de programación **Latino** a **JavaScript**.
 ## Repositorio
 [Link del repositorio en GitHub](https://github.com/nquirogac/Traductor)
 
+## Miebros del equipo
+- Santiago Londoño (@slondonoq)
+- Natalia Quiroga (@nquirogac)
+- Jonathan Moncaleano (@MoNKy0112)
+- Byron Giraldo (@bygiraldoc)
+
 ## Requerimientos
 Instalar  ANTlR4 para python
 
