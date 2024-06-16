@@ -5,6 +5,7 @@ from translations.functions import *
 from translations.structures import *
 from translations.conditional import *
 from translations.switch import *
+from translations.loops import *
 
 class LatinoToJs(LatinoGrammarListener):
 
@@ -19,23 +20,27 @@ class LatinoToJs(LatinoGrammarListener):
             'falso': 'false',
             'nulo': 'null',
         }
+        self.rangeCreated = False
+        self.infor = False
 
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         # Determine what function to use based on what rule will be applied
-        if self.indentationStack:
-            for i in range(len(self.indentationStack)):
-                self.jsCode += '    '    
+        if not self.infor:
+            if self.indentationStack:
+                for i in range(len(self.indentationStack)):
+                    self.jsCode += '    '
 
         if ctx.assig():
             enterAssignationSentence(self, ctx)
         elif ctx.assignableID():
             if '.' not in ctx.assignableID().getText():
                 self.jsCode += ctx.assignableID().getText()
+
+        if ctx.R_UNARY_OP():
+            self.jsCode += ctx.R_UNARY_OP().getText()
             
         elif ctx.functionCall():
             print('Function calls need to go here')
-        elif ctx.R_UNARY_OP():
-            print('R_UNARY_OPS need to go here')
         elif ctx.functionReturn():
             if '?~sentence' in self.jsCode:
                 self.jsCode = self.jsCode.replace('?~sentence', '?~return', 1)
@@ -48,10 +53,14 @@ class LatinoToJs(LatinoGrammarListener):
         
 
     def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
-        
-        if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
-            self.jsCode += ';'
-        self.jsCode += '\n'
+        if self.infor:
+            self.jsCode += '){\n'
+            self.infor = False
+
+        else:
+            if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
+                self.jsCode += ';'
+            self.jsCode += '\n'
 
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
@@ -181,6 +190,31 @@ class LatinoToJs(LatinoGrammarListener):
     def exitSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
         exitSwitchCases(self,ctx)
         pass
+
+    def enterWhileBlock(self, ctx: LatinoGrammarParser.WhileBlockContext):
+        enterWhileBlockRule(self, ctx)
+
+    def exitWhileBlock(self, ctx: LatinoGrammarParser.WhileBlockContext):
+        exitWhileBlockRule(self, ctx)
+
+    def enterDoWhileBlock(self, ctx: LatinoGrammarParser.DoWhileBlockContext):
+        enterDoWhileBlockRule(self, ctx)
+
+    def exitDoWhileBlock(self, ctx: LatinoGrammarParser.DoWhileBlockContext):
+        exitDoWhileBlockRule(self, ctx)
+
+    def enterForBlock(self, ctx:LatinoGrammarParser.ForBlockContext):
+        enterForBlockRule(self, ctx)
+
+    def exitForBlock(self, ctx:LatinoGrammarParser.ForBlockContext):
+        exitForBlockRule(self, ctx)
+
+    def enterForRangeBlock(self, ctx:LatinoGrammarParser.ForRangeBlockContext):
+        enterForRangeBlockRule(self, ctx)
+
+    def exitForRangeBlock(self, ctx:LatinoGrammarParser.ForRangeBlockContext):
+        exitForRangeBlockRule(self, ctx)
+
     def exitSource(self, ctx:LatinoGrammarParser.SourceContext):
         print("----------------------JS CODE----------------------")
         print(self.jsCode)
