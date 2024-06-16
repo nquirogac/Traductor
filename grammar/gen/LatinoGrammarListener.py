@@ -1,4 +1,4 @@
-# Generated from C:/Users/londo/Documents/Estudio/Materias/Lenguajes de programación/Traductor/grammar/LatinoGrammar.g4 by ANTLR 4.13.1
+# Generated from P:/Universidad/8 Semestre 2024-1/Lenguajes de Programacion/Trabajos en grupo/Traductor/grammar/LatinoGrammar.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .LatinoGrammarParser import LatinoGrammarParser
@@ -248,6 +248,24 @@ class LatinoGrammarListener(ParseTreeListener):
 
     # Exit a parse tree produced by LatinoGrammarParser#conditionalBlock.
     def exitConditionalBlock(self, ctx:LatinoGrammarParser.ConditionalBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by LatinoGrammarParser#altCondition.
+    def enterAltCondition(self, ctx:LatinoGrammarParser.AltConditionContext):
+        pass
+
+    # Exit a parse tree produced by LatinoGrammarParser#altCondition.
+    def exitAltCondition(self, ctx:LatinoGrammarParser.AltConditionContext):
+        pass
+
+
+    # Enter a parse tree produced by LatinoGrammarParser#noCondition.
+    def enterNoCondition(self, ctx:LatinoGrammarParser.NoConditionContext):
+        pass
+
+    # Exit a parse tree produced by LatinoGrammarParser#noCondition.
+    def exitNoCondition(self, ctx:LatinoGrammarParser.NoConditionContext):
         pass
 
 

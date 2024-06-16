@@ -1,6 +1,9 @@
 from grammar.gen.LatinoGrammarListener import LatinoGrammarListener
 from grammar.gen.LatinoGrammarParser import LatinoGrammarParser
 from translations.assignations import *
+from translations.conditional import *
+from translations.switch import *
+
 from translations.functions import *
 from translations.structures import *
 
@@ -10,7 +13,7 @@ class LatinoToJs(LatinoGrammarListener):
         self.symbolArray = []  # Used to keep track of defined variables
         self.indentationStack = []  # Use to keep indentation levels when nesting blocks
         self.jsCode = ''
-        self.passSemiColon = [';', '/', '}','\n']
+        self.passSemiColon = [';', '/', '}', '\n']
         self.boolean_and_null_translation = {
             'verdadero': 'true', '"verdadero"': '"true"',
             'cierto': 'true',
@@ -22,7 +25,7 @@ class LatinoToJs(LatinoGrammarListener):
         # Determine what function to use based on what rule will be applied
         if self.indentationStack:
             for i in range(len(self.indentationStack)):
-                self.jsCode += '    '    
+                self.jsCode += '    '
 
         if ctx.assig():
             enterAssignationSentence(self, ctx)
@@ -34,6 +37,8 @@ class LatinoToJs(LatinoGrammarListener):
             print('Function calls need to go here')
         elif ctx.R_UNARY_OP():
             print('R_UNARY_OPS need to go here')
+        elif ctx.builtInFuncSentence():
+            print('Built in sentences go here')
         elif ctx.functionReturn():
             if '?~sentence' in self.jsCode:
                 self.jsCode = self.jsCode.replace('?~sentence', '?~return', 1)
@@ -43,7 +48,7 @@ class LatinoToJs(LatinoGrammarListener):
             print('Do while goes here')
         elif ctx.codeBlock():
             print('Do while goes here')
-        
+
 
     def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         
@@ -54,8 +59,6 @@ class LatinoToJs(LatinoGrammarListener):
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
 
-    def enterAssignableID(self, ctx:LatinoGrammarParser.AssignableIDContext):
-        self.jsCode += ctx.ID().getText()
 
     def enterExp(self, ctx:LatinoGrammarParser.ExpContext):
         if '?~PrintArgs' in self.jsCode:
@@ -126,9 +129,34 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterFunctionCall(self, ctx:LatinoGrammarParser.FunctionCallContext):
         enterFunctionCallRule(self, ctx)
-    
+
     def enterBuiltInFuncSentence(self, ctx:LatinoGrammarParser.BuiltInFuncSentenceContext):
         enterBuiltInFuncSentenceRule(self, ctx)
+
+    def enterConditionalBlock(self, ctx: LatinoGrammarParser.ConditionalBlockContext):
+        enterConditional(self, ctx)
+
+    def exitConditionalBlock(self, ctx: LatinoGrammarParser.ConditionalBlockContext):
+        exitConditional(self, ctx)
+
+    def enterAltCondition(self, ctx: LatinoGrammarParser.AltConditionContext):
+        enterAltConditional(self, ctx)
+
+    def enterNoCondition(self, ctx: LatinoGrammarParser.NoConditionContext):
+        enterNoConditional(self, ctx)
+
+    def enterSwitchBlock(self, ctx: LatinoGrammarParser.SwitchBlockContext):
+        enterSwitch(self, ctx)
+
+    def exitSwitchBlock(self, ctx: LatinoGrammarParser.SwitchBlockContext):
+        exitSwitch(self, ctx)
+
+    def enterSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
+        enterSwitchCases(self, ctx)
+
+    def exitSwitchCasesDef(self, ctx: LatinoGrammarParser.SwitchCasesDefContext):
+        exitSwitchCases(self,ctx)
+        pass
 
     def enterListDefinition(self, ctx:LatinoGrammarParser.ListDefinitionContext):
         enterListDefRule(self, ctx)
