@@ -148,6 +148,11 @@ class LatinoToJs(LatinoGrammarListener):
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~switchBlock', 1)
         elif ctx.forBlock():
             self.jsCode = self.jsCode.replace('?~codeBlock', '?~forBlock', 1)
+        elif ctx.whileBlock():
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~whileBlock', 1)
+        else:
+            # Remaining case is for range
+            self.jsCode = self.jsCode.replace('?~codeBlock', '?~rangedForBlock', 1)
 
     def enterFunctionBlock(self, ctx:LatinoGrammarParser.FunctionBlockContext):
         enterFunctionBlockRule(self, ctx)

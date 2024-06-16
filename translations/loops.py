@@ -3,16 +3,17 @@
 
 def enterWhileBlockRule(self, ctx):
     exp = ctx.exp().getText()
-    #print(f"la expresion del while es: {exp}")
-    self.jsCode += f'while ?~exp' if exp[0] == '(' and exp[-1] == ')' else f'while (?~exp)'
-    self.jsCode += '{\n'
-    self.indentationStack.append(1)
+
+    string_replacement = 'while ?~exp {\n' if exp[0] == '(' and exp[-1] == ')' else 'while (?~exp) {\n'
+    for _ in ctx.sentence():
+        string_replacement += '?~sentence'
+
+    string_replacement += self.indentationStack[-1]*'\t' + '}'
+
+    self.indentationStack.append(self.indentationStack[-1]+1)
+    self.jsCode = self.jsCode.replace('?~whileBlock', string_replacement, 1)
 
 def exitWhileBlockRule(self, ctx):
-    if len(self.indentationStack) > 0:
-        for i in range(len(self.indentationStack) - 1):
-            self.jsCode += '    '
-    self.jsCode += '}'
     self.indentationStack.pop()
 
 def enterDoWhileBlockRule(self, ctx):
@@ -60,6 +61,7 @@ def enterForRangeBlockRule(self, ctx):
     inicio = False
     fin = False
     salto = False
+    string_replacement = ''
 
     if len(ctx.exp()) == 1:
         inicio = True
@@ -72,49 +74,47 @@ def enterForRangeBlockRule(self, ctx):
         salto = True
 
     if not self.rangeCreated:
-        self.jsCode += 'function range(start, end, step) {\n'
-        self.jsCode += '    if (end === undefined) {\n'
-        self.jsCode += '        end = start;\n'
-        self.jsCode += '        start = 0;\n'
-        self.jsCode += '    }\n'
-        self.jsCode += '    if (step === undefined) {\n'
-        self.jsCode += '        step = 1;\n'
-        self.jsCode += '    }\n'
-        self.jsCode += '    let result = [];\n'
-        self.jsCode += '    if (step > 0) {\n'
-        self.jsCode += '        for (let i = start; i < end; i += step) {\n'
-        self.jsCode += '            result.push(i);\n'
-        self.jsCode += '        }\n'
-        self.jsCode += '    } else {\n'
-        self.jsCode += '        for (let i = start; i > end; i += step) {\n'
-        self.jsCode += '            result.push(i);\n'
-        self.jsCode += '        }\n'
-        self.jsCode += '    }\n'
-        self.jsCode += '    return result;\n'
-        self.jsCode += '}\n'
+        string_replacement += 'function range(start, end, step) {\n'
+        string_replacement += '    if (end === undefined) {\n'
+        string_replacement += '        end = start;\n'
+        string_replacement += '        start = 0;\n'
+        string_replacement += '    }\n'
+        string_replacement += '    if (step === undefined) {\n'
+        string_replacement += '        step = 1;\n'
+        string_replacement += '    }\n'
+        string_replacement += '    let result = [];\n'
+        string_replacement += '    if (step > 0) {\n'
+        string_replacement += '        for (let i = start; i < end; i += step) {\n'
+        string_replacement += '            result.push(i);\n'
+        string_replacement += '        }\n'
+        string_replacement += '    } else {\n'
+        string_replacement += '        for (let i = start; i > end; i += step) {\n'
+        string_replacement += '            result.push(i);\n'
+        string_replacement += '        }\n'
+        string_replacement += '    }\n'
+        string_replacement += '    return result;\n'
+        string_replacement += '}\n'
 
         self.rangeCreated = True
 
     item_iter = ctx.ID().getText()
 
     if inicio and fin and salto:
-        #self.jsCode += f'hay 3 parametros, inicio: ?~exp, fin: ?~exp, salto: ?~exp'
-        self.jsCode += f'for (let {item_iter} of range(?~exp, ?~exp, ?~exp))'
-        self.jsCode += '{\n'
+        string_replacement += f'for (let {item_iter} of range(?~exp, ?~exp, ?~exp))'
+        string_replacement += '{\n'
     elif inicio and fin:
-        #elf.jsCode += f'hay 2 parametros, inicio: ?~exp, fin: ?~exp'
-        self.jsCode += f'for (let {item_iter} of range(?~exp, ?~exp))'
-        self.jsCode += '{\n'
+        string_replacement += f'for (let {item_iter} of range(?~exp, ?~exp))'
+        string_replacement += '{\n'
     elif inicio:
-        #elf.jsCode += f'hay 1 parametro, inicio: ?~exp'
-        self.jsCode += f'for (let {item_iter} of range(?~exp))'
-        self.jsCode += '{\n'
+        string_replacement += f'for (let {item_iter} of range(?~exp))'
+        string_replacement += '{\n'
 
-    self.indentationStack.append(1)
+    for _ in ctx.sentence():
+        string_replacement += '?~sentence'
+
+    string_replacement += self.indentationStack[-1]*'\t' + '}'
+    self.indentationStack.append(self.indentationStack[-1]+1)
+    self.jsCode = self.jsCode.replace('?~rangedForBlock', string_replacement, 1)
 
 def exitForRangeBlockRule(self, ctx):
-    if len(self.indentationStack) > 0:
-        for i in range(len(self.indentationStack) - 1):
-            self.jsCode += '    '
-    self.jsCode += '}'
     self.indentationStack.pop()
