@@ -20,6 +20,7 @@ def enterAssignationRule(LatinoToJSInstance, ctx):
     operator = ctx.ASSIGN().getText() if ctx.ASSIGN() else ctx.ASSIGN_OP().getText()
     assignable_expressions = ctx.assignableExp()
     string_replacement = ''
+    there_is_anonymous_func = False
 
     for i in range(len(variables)+1):
         if i > 0:
@@ -32,5 +33,9 @@ def enterAssignationRule(LatinoToJSInstance, ctx):
 
         if len(assignable_expressions) > i:
             string_replacement += f' {operator} ?~exp'
+            if assignable_expressions[i-1].anonymousFuncDef():
+                there_is_anonymous_func = True
 
+    if not there_is_anonymous_func:
+        string_replacement += ';'
     LatinoToJSInstance.jsCode = LatinoToJSInstance.jsCode.replace('?~assignation', string_replacement, 1)

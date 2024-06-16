@@ -1,4 +1,4 @@
-# Generated from P:/Universidad/8 Semestre 2024-1/Lenguajes de Programacion/Trabajos en grupo/Traductor/grammar/LatinoGrammar.g4 by ANTLR 4.13.1
+# Generated from C:/Users/londo/Documents/Estudio/Materias/Lenguajes de programación/Traductor/grammar/LatinoGrammar.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .LatinoGrammarParser import LatinoGrammarParser

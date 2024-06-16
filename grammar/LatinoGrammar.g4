@@ -29,7 +29,6 @@ terminal                    :
                              L_UNARY_OP exp |
                              opBuiltInTipo |
                              OP_BUILTIN_FUNCS_NO_ARG OPENING_PAR CLOSING_PAR |
-                             anonymousFuncDef |
                              listDefinition |
                              dictDefinition;
 opBuiltInTipo               : OP_BUILTIN_FUNCS_ARG OPENING_PAR assignableExp CLOSING_PAR;

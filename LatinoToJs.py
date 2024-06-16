@@ -31,19 +31,14 @@ class LatinoToJs(LatinoGrammarListener):
     def enterSentence(self, ctx: LatinoGrammarParser.SentenceContext):
         tabs = self.indentationStack[-1]*'\t'
         lineEnd = ';\n'
-
+        # Skip tabs and ending for some sentences ex: inside for
         if '?~noTab' in self.jsCode:
             self.jsCode = self.jsCode.replace('?~noTab', '')
             tabs = ''
             lineEnd = ''
-        # Determine what function to use based on what rule will be applied
-        # if not self.infor:
-        #     if self.indentationStack:
-        #         for i in range(len(self.indentationStack)):
-        #             self.jsCode += '    '
 
         if ctx.assig():
-            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assig-sentence{lineEnd}', 1)
+            self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assig-sentence\n', 1)
             enterAssignationSentence(self, ctx)
         elif ctx.R_UNARY_OP():
             self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}?~assigID{ctx.R_UNARY_OP().getText()}{lineEnd}', 1)
@@ -63,21 +58,6 @@ class LatinoToJs(LatinoGrammarListener):
             # The only remaining case is break
             self.jsCode = self.jsCode.replace('?~sentence', f'{tabs}break{lineEnd}', 1)
 
-        
-
-    # def exitSentence(self, ctx: LatinoGrammarParser.SentenceContext):
-        # if self.infor:
-        #     self.jsCode += '){\n'
-        #     self.infor = False
-
-        # else:
-        #     if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
-        #         self.jsCode += ';'
-        #     self.jsCode += '\n'
-        # string_replacement = ''
-        # if self.jsCode != '' and self.jsCode[-1] not in self.passSemiColon:
-        #     string_replacement += ';'
-        # self.jsCode += '\n'
 
     def enterAssig(self, ctx:LatinoGrammarParser.AssigContext):
         enterAssignationRule(self, ctx)
@@ -134,6 +114,11 @@ class LatinoToJs(LatinoGrammarListener):
             string_to_replace = '?~opBT'
         elif ctx.listDefinition():
             string_to_replace = '?~listDef'
+        elif ctx.OP_BUILTIN_FUNCS_NO_ARG():
+            string_to_replace = 'JS no toma inputs de la consola, si se necesitan entradas del usuario se deben usar librerías o etiquetas HTML'
+        else:
+            # Only remaining case is dict definition
+            string_to_replace = '?~dictDef'
         self.jsCode = self.jsCode.replace('?~terminal', string_to_replace, 1)
 
     def enterOpBuiltInTipo(self, ctx:LatinoGrammarParser.OpBuiltInTipoContext):
@@ -171,6 +156,10 @@ class LatinoToJs(LatinoGrammarListener):
 
     def enterListDefinition(self, ctx:LatinoGrammarParser.ListDefinitionContext):
         enterListDefRule(self, ctx)
+
+
+    def enterDictDefinition(self, ctx:LatinoGrammarParser.DictDefinitionContext):
+        enterDictDefRule(self, ctx)
 
 
     def enterAnonymousFuncDef(self, ctx:LatinoGrammarParser.AnonymousFuncDefContext):
